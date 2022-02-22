@@ -22,6 +22,11 @@ export class TaskService {
     return this.http.get<Task[]>(this.apiUrl);
   }
 
+  getTask(taskId: number): Observable<Task> {
+    const url = `${this.apiUrl}/${taskId}`;
+    return this.http.get<Task>(url, httpOptions);
+  }
+
   deleteTask(task: Task): Observable<Task> {
     const url = `${this.apiUrl}/${task.id}`;
     return this.http.delete<Task>(url);
@@ -34,5 +39,10 @@ export class TaskService {
 
   addTask(task: Task): Observable<Task> {
     return this.http.post<Task>(this.apiUrl, task, httpOptions);
+  }
+
+  updateTask(task: Task): Observable<Task> {    
+    const url = `${this.apiUrl}/${task.id}`;
+    return this.http.put<Task>(url, task, httpOptions);
   }
 }

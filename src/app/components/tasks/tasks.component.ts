@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { UiService } from '../../services/ui.service';
 import { TaskService } from '../../services/task.service';
 import { Task } from '../../Task';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-tasks',
@@ -10,8 +12,11 @@ import { Task } from '../../Task';
 export class TasksComponent implements OnInit {
 
   tasks: Task[] = [];
+  subscription!: Subscription;
 
-  constructor(private taskService: TaskService) { }
+  constructor(private taskService: TaskService, private uiService: UiService) {    
+    this.subscription = this.uiService.onToggle().subscribe((task) => this.updateTask(task));
+  }
 
   ngOnInit(): void {
     this.taskService.getTasks().subscribe((tasks) => this.tasks = tasks);
@@ -32,5 +37,12 @@ export class TasksComponent implements OnInit {
 
   addTask(task: Task) {
     this.taskService.addTask(task).subscribe((task) => this.tasks.push(task));
+  }
+
+  updateTask(task: Task) {    
+    this.taskService.updateTask(task).subscribe((task) => {
+      let taskIndex = this.tasks.findIndex(t => t.id === task.id);
+      this.tasks[taskIndex] = task;
+    });
   }
 }
