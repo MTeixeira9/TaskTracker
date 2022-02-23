@@ -3,6 +3,7 @@ import { UiService } from '../../services/ui.service';
 import { TaskService } from '../../services/task.service';
 import { Task } from '../../Task';
 import { Subscription } from 'rxjs';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-tasks',
@@ -27,12 +28,7 @@ export class TasksComponent implements OnInit {
     .deleteTask(task)
     .subscribe(
       () => (this.tasks = this.tasks.filter(t => t.id !== task.id))
-      );
-  }
-
-  toggleReminder(task: Task) {
-    task.reminder = !task.reminder;
-    this.taskService.updateTaskReminder(task).subscribe();
+    );
   }
 
   addTask(task: Task) {
@@ -44,5 +40,22 @@ export class TasksComponent implements OnInit {
       let taskIndex = this.tasks.findIndex(t => t.id === task.id);
       this.tasks[taskIndex] = task;
     });
+  }
+
+  drop(event: CdkDragDrop<string[]>) {
+    const previousIndexTaskText = this.tasks[event.previousIndex].text;
+    const previousIndexTaskDay = this.tasks[event.previousIndex].day;
+    const previousIndexTaskReminder = this.tasks[event.previousIndex].reminder;
+
+    this.tasks[event.previousIndex].text = this.tasks[event.currentIndex].text;
+    this.tasks[event.previousIndex].day = this.tasks[event.currentIndex].day;
+    this.tasks[event.previousIndex].reminder = this.tasks[event.currentIndex].reminder;
+
+    this.tasks[event.currentIndex].text = previousIndexTaskText;
+    this.tasks[event.currentIndex].day = previousIndexTaskDay;
+    this.tasks[event.currentIndex].reminder = previousIndexTaskReminder;
+
+    this.updateTask(this.tasks[event.previousIndex]);
+    this.updateTask(this.tasks[event.currentIndex]);
   }
 }
